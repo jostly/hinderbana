@@ -22,6 +22,7 @@ import java.util.List;
 import static java.lang.Math.random;
 
 public class MainLoop extends Application {
+    public static final int MOVE_VEL = 25;
     boolean left = false;
     boolean right = false;
     boolean up = false;
@@ -39,6 +40,7 @@ public class MainLoop extends Application {
             else if (keyCode == KeyCode.DOWN) down = true;
             else if (keyCode == KeyCode.LEFT) left = true;
             else if (keyCode == KeyCode.RIGHT) right = true;
+            else if (keyCode == KeyCode.ESCAPE) System.exit(0);
 
             inputEvent.consume();
         };
@@ -65,9 +67,7 @@ public class MainLoop extends Application {
         root.getChildren().add(player);
 
         Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(10), event -> {
-            left = right = up = down = false;
-
-            System.out.println("TICK!");
+//            System.out.println("TICK!");
 
             for (Circle c : obstacles) {
                 c.setCenterY(c.getCenterY() + 1);
@@ -77,6 +77,15 @@ public class MainLoop extends Application {
                 obstacles.add(c);
                 root.getChildren().add(c);
             }
+
+//            System.out.println("pre: " + player.translateYProperty().getValue() + " (up = " + up + ")");
+            Double curX = player.getTranslateX();
+            Double curY = player.getTranslateY();
+            player.setTranslateX(left ? curX + MOVE_VEL : right ? curX - MOVE_VEL : curX);
+            player.setTranslateY(up ? curY + MOVE_VEL : down ? curY - MOVE_VEL : curY);
+//            System.out.println("post: " + player.translateYProperty().getValue() + " (up = " + up + ")");
+
+            left = right = up = down = false;
         }));
         gameLoop.setCycleCount(Animation.INDEFINITE);
 
