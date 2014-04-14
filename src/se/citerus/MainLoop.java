@@ -23,6 +23,8 @@ import static java.lang.Math.random;
 
 public class MainLoop extends Application {
     public static final int MOVE_VEL = 10;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
     boolean left = false;
     boolean right = false;
     boolean up = false;
@@ -31,7 +33,7 @@ public class MainLoop extends Application {
     @Override
     public void start(Stage primaryStage) {
         Group root = new Group();
-        Scene scene = new Scene(root, 800, 600, Color.BLACK);
+        Scene scene = new Scene(root, WIDTH, HEIGHT, Color.BLACK);
         primaryStage.setScene(scene);
 
         EventHandler<KeyEvent> eventEventHandlerPressed = inputEvent -> {
@@ -93,8 +95,10 @@ public class MainLoop extends Application {
 //            System.out.println("pre: " + player.translateYProperty().getValue() + " (up = " + up + ")");
             Double curX = player.getTranslateX();
             Double curY = player.getTranslateY();
-            player.setTranslateX(left ? curX - MOVE_VEL : right ? curX + MOVE_VEL : curX);
-            player.setTranslateY(up ? curY - MOVE_VEL : down ? curY + MOVE_VEL : curY);
+            double playerWidth = player.getLayoutBounds().getWidth();
+            double playerHeight = player.getLayoutBounds().getHeight();
+            player.setTranslateX(left ? Double.max(curX - MOVE_VEL, playerWidth) : right ? Double.min(curX + MOVE_VEL, WIDTH - playerWidth) : curX);
+            player.setTranslateY(up ? Double.max(curY - MOVE_VEL, playerHeight) : down ? Double.min(curY + MOVE_VEL, HEIGHT - playerHeight) : curY);
 //            System.out.println("post: " + player.translateYProperty().getValue() + " (up = " + up + ")");
             for (Circle obstacle : obstacles) {
                 if (obstacle.getCenterX() + obstacle.getRadius() > player.getTranslateX() &&
