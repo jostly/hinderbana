@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -21,7 +22,10 @@ import java.util.List;
 import static java.lang.Math.random;
 
 public class MainLoop extends Application {
-
+    boolean left = false;
+    boolean right = false;
+    boolean up = false;
+    boolean down = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -30,12 +34,16 @@ public class MainLoop extends Application {
         primaryStage.setScene(scene);
 
         EventHandler<KeyEvent> eventEventHandler = inputEvent -> {
-            System.out.println(inputEvent.toString());
+            KeyCode keyCode = inputEvent.getCode();
+            if (keyCode == KeyCode.UP) up = true;
+            else if (keyCode == KeyCode.DOWN) down = true;
+            else if (keyCode == KeyCode.LEFT) left = true;
+            else if (keyCode == KeyCode.RIGHT) right = true;
+
             inputEvent.consume();
         };
 
         scene.setOnKeyPressed(eventEventHandler);
-
 
         final List<Circle> obstacles = new LinkedList<>();
 
@@ -57,6 +65,10 @@ public class MainLoop extends Application {
         root.getChildren().add(player);
 
         Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(10), event -> {
+            left = right = up = down = false;
+
+            System.out.println("TICK!");
+
             for (Circle c : obstacles) {
                 c.setCenterY(c.getCenterY() + 1);
             }
