@@ -19,7 +19,7 @@ import javafx.util.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.lang.Math.random;
+import static java.lang.Math.*;
 
 public class MainLoop extends Application {
     public static final int MOVE_VEL = 10;
@@ -101,11 +101,9 @@ public class MainLoop extends Application {
             player.setTranslateY(up ? Double.max(curY - MOVE_VEL, playerHeight) : down ? Double.min(curY + MOVE_VEL, HEIGHT - playerHeight) : curY);
 //            System.out.println("post: " + player.translateYProperty().getValue() + " (up = " + up + ")");
             for (Circle obstacle : obstacles) {
-                if (obstacle.getCenterX() + obstacle.getRadius() > player.getTranslateX() &&
-                        obstacle.getCenterX() - obstacle.getRadius() < player.getTranslateX() &&
-                        obstacle.getCenterY() + obstacle.getRadius() > player.getTranslateY() &&
-                        obstacle.getCenterY() - obstacle.getRadius() < player.getTranslateY()
-                        ) System.exit(0);
+                if (sqrt(pow(obstacle.getCenterX() - player.getTranslateX(), 2) +
+                        pow(obstacle.getCenterY() - player.getTranslateY(), 2))
+                        < obstacle.getRadius()) System.exit(0);
             }
         }));
 
