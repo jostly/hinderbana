@@ -22,7 +22,7 @@ import java.util.List;
 import static java.lang.Math.random;
 
 public class MainLoop extends Application {
-    public static final int MOVE_VEL = 25;
+    public static final int MOVE_VEL = 10;
     boolean left = false;
     boolean right = false;
     boolean up = false;
@@ -34,7 +34,7 @@ public class MainLoop extends Application {
         Scene scene = new Scene(root, 800, 600, Color.BLACK);
         primaryStage.setScene(scene);
 
-        EventHandler<KeyEvent> eventEventHandler = inputEvent -> {
+        EventHandler<KeyEvent> eventEventHandlerPressed = inputEvent -> {
             KeyCode keyCode = inputEvent.getCode();
             if (keyCode == KeyCode.UP) up = true;
             else if (keyCode == KeyCode.DOWN) down = true;
@@ -45,7 +45,19 @@ public class MainLoop extends Application {
             inputEvent.consume();
         };
 
-        scene.setOnKeyPressed(eventEventHandler);
+        EventHandler<KeyEvent> eventEventHandlerRelease = inputEvent -> {
+            KeyCode keyCode = inputEvent.getCode();
+            if (keyCode == KeyCode.UP) up = false;
+            else if (keyCode == KeyCode.DOWN) down = false;
+            else if (keyCode == KeyCode.LEFT) left = false;
+            else if (keyCode == KeyCode.RIGHT) right = false;
+            else if (keyCode == KeyCode.ESCAPE) System.exit(0);
+
+            inputEvent.consume();
+        };
+
+        scene.setOnKeyPressed(eventEventHandlerPressed);
+        scene.setOnKeyReleased(eventEventHandlerRelease);
 
         final List<Circle> obstacles = new LinkedList<>();
 
@@ -81,12 +93,18 @@ public class MainLoop extends Application {
 //            System.out.println("pre: " + player.translateYProperty().getValue() + " (up = " + up + ")");
             Double curX = player.getTranslateX();
             Double curY = player.getTranslateY();
-            player.setTranslateX(left ? curX + MOVE_VEL : right ? curX - MOVE_VEL : curX);
-            player.setTranslateY(up ? curY + MOVE_VEL : down ? curY - MOVE_VEL : curY);
+            player.setTranslateX(left ? curX - MOVE_VEL : right ? curX + MOVE_VEL : curX);
+            player.setTranslateY(up ? curY - MOVE_VEL : down ? curY + MOVE_VEL : curY);
 //            System.out.println("post: " + player.translateYProperty().getValue() + " (up = " + up + ")");
-
-            left = right = up = down = false;
+            for (Circle obstacle : obstacles) {
+                if (obstacle.getCenterX() + obstacle.getRadius() > player.getTranslateX() &&
+                        obstacle.getCenterX() - obstacle.getRadius() < player.getTranslateX() &&
+                        obstacle.getCenterY() + obstacle.getRadius() > player.getTranslateY() &&
+                        obstacle.getCenterY() - obstacle.getRadius() < player.getTranslateY()
+                        ) System.exit(0);
+            }
         }));
+
         gameLoop.setCycleCount(Animation.INDEFINITE);
 
         gameLoop.play();
