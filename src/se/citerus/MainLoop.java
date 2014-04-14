@@ -10,11 +10,18 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.lang.Math.random;
+
 public class MainLoop extends Application {
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -29,21 +36,51 @@ public class MainLoop extends Application {
 
         scene.setOnKeyPressed(eventEventHandler);
 
-        Circle circle = new Circle(150, Color.web("white", 0.5));
-        circle.setStrokeType(StrokeType.OUTSIDE);
-        circle.setStroke(Color.web("white", 0.9));
-        circle.setStrokeWidth(4);
+
+        final List<Circle> obstacles = new LinkedList<>();
+
+        Circle circle = createObstacle();
+
+        obstacles.add(circle);
 
         root.getChildren().add(circle);
 
+        Polygon player = new Polygon(
+                0.0, 0.0,
+                20.0, 40.0,
+                -20.0, 40.0
+        );
+        player.setFill(Color.AQUA);
+        player.setTranslateY(500);
+        player.setTranslateX(400);
+
+        root.getChildren().add(player);
+
         Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(10), event -> {
-            System.out.println("TICK!");
+            for (Circle c : obstacles) {
+                c.setCenterY(c.getCenterY() + 1);
+            }
+            if (random() < 0.01) {
+                Circle c = createObstacle();
+                obstacles.add(c);
+                root.getChildren().add(c);
+            }
         }));
         gameLoop.setCycleCount(Animation.INDEFINITE);
 
         gameLoop.play();
 
         primaryStage.show();
+    }
+
+    private Circle createObstacle() {
+        Circle circle = new Circle(40, Color.web("red", 0.5));
+        circle.setStrokeType(StrokeType.OUTSIDE);
+        circle.setStroke(Color.web("green", 0.9));
+        circle.setStrokeWidth(4);
+        circle.setCenterY(-40);
+        circle.setCenterX(random() * 800);
+        return circle;
     }
 
     public static void main(String[] args) {
