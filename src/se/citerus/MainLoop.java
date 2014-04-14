@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -35,10 +36,13 @@ public class MainLoop extends Application {
 
         EventHandler<KeyEvent> eventEventHandler = inputEvent -> {
             KeyCode keyCode = inputEvent.getCode();
+            left = right = up = down = false;
+
             if (keyCode == KeyCode.UP) up = true;
             else if (keyCode == KeyCode.DOWN) down = true;
             else if (keyCode == KeyCode.LEFT) left = true;
             else if (keyCode == KeyCode.RIGHT) right = true;
+            else if (keyCode == KeyCode.ESCAPE) System.exit(0);
 
             inputEvent.consume();
         };
@@ -64,10 +68,7 @@ public class MainLoop extends Application {
 
         root.getChildren().add(player);
 
-        Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(10), event -> {
-            left = right = up = down = false;
-
-            System.out.println("TICK!");
+        Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(20), event -> {
 
             for (Circle c : obstacles) {
                 c.setCenterY(c.getCenterY() + 1);
@@ -77,6 +78,18 @@ public class MainLoop extends Application {
                 obstacles.add(c);
                 root.getChildren().add(c);
             }
+
+            double playerX = player.getTranslateX();
+            double playerY = player.getTranslateY();
+            double speed = 5;
+            if (left) {
+                playerX -= speed;
+            }
+            if (right) {
+                playerX += speed;
+            }
+
+            player.setTranslateX(playerX);
         }));
         gameLoop.setCycleCount(Animation.INDEFINITE);
 
