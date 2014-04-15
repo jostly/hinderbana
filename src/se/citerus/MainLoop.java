@@ -102,7 +102,7 @@ public class MainLoop extends Application {
             player.setTranslateY(up ? Double.max(curY - MOVE_VEL, playerHeight) : down ? Double.min(curY + MOVE_VEL, HEIGHT - playerHeight) : curY);
 
             for (Circle obstacle : obstacles) {
-                if (isObstacleColliding(obstacle, player.getPoints())) System.exit(0);
+                if (isObstacleColliding(obstacle, player)) System.exit(0);
 //                if (sqrt(pow(obstacle.getCenterX() - player.getTranslateX(), 2) +
 //                        pow(obstacle.getCenterY() - player.getTranslateY(), 2))
 //                        < obstacle.getRadius()) System.exit(0);
@@ -116,8 +116,10 @@ public class MainLoop extends Application {
         primaryStage.show();
     }
 
-    private boolean isObstacleColliding(Circle obstacle, List<Double> points) {
+    private boolean isObstacleColliding(Circle obstacle, Polygon player) {
         List<Pair<Double, Double>> coordinatePairs = new ArrayList<>();
+        List<Double> points = player.getPoints();
+
         Double previous = null;
         for (Double point : points) {
             if (previous == null) {
@@ -128,8 +130,11 @@ public class MainLoop extends Application {
             }
         }
         for (Pair<Double, Double> pair : coordinatePairs) {
-            if (sqrt(pow(obstacle.getCenterX() - pair.getKey(), 2) +
-                    pow(obstacle.getCenterY() - pair.getValue(), 2))
+            double x = player.getTranslateX() + pair.getKey();
+            double y = player.getTranslateY() + pair.getValue();
+
+            if (sqrt(pow(obstacle.getCenterX() - x, 2) +
+                    pow(obstacle.getCenterY() - y, 2))
                     < obstacle.getRadius()) {
                 System.out.println("Hit obstacle!");
                 return true;
