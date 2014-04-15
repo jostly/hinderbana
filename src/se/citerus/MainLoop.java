@@ -15,7 +15,9 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -92,18 +94,18 @@ public class MainLoop extends Application {
                 root.getChildren().add(c);
             }
 
-//            System.out.println("pre: " + player.translateYProperty().getValue() + " (up = " + up + ")");
             Double curX = player.getTranslateX();
             Double curY = player.getTranslateY();
             double playerWidth = player.getLayoutBounds().getWidth();
             double playerHeight = player.getLayoutBounds().getHeight();
             player.setTranslateX(left ? Double.max(curX - MOVE_VEL, playerWidth) : right ? Double.min(curX + MOVE_VEL, WIDTH - playerWidth) : curX);
             player.setTranslateY(up ? Double.max(curY - MOVE_VEL, playerHeight) : down ? Double.min(curY + MOVE_VEL, HEIGHT - playerHeight) : curY);
-//            System.out.println("post: " + player.translateYProperty().getValue() + " (up = " + up + ")");
+
             for (Circle obstacle : obstacles) {
-                if (sqrt(pow(obstacle.getCenterX() - player.getTranslateX(), 2) +
-                        pow(obstacle.getCenterY() - player.getTranslateY(), 2))
-                        < obstacle.getRadius()) System.exit(0);
+                if (isObstacleColliding(obstacle, player.getPoints())) System.exit(0);
+//                if (sqrt(pow(obstacle.getCenterX() - player.getTranslateX(), 2) +
+//                        pow(obstacle.getCenterY() - player.getTranslateY(), 2))
+//                        < obstacle.getRadius()) System.exit(0);
             }
         }));
 
@@ -112,6 +114,28 @@ public class MainLoop extends Application {
         gameLoop.play();
 
         primaryStage.show();
+    }
+
+    private boolean isObstacleColliding(Circle obstacle, List<Double> points) {
+        List<Pair<Double, Double>> coordinatePairs = new ArrayList<>();
+        Double previous = null;
+        for (Double point : points) {
+            if (previous == null) {
+                previous = point;
+            } else {
+                coordinatePairs.add(new Pair<>(previous, point));
+                previous = null;
+            }
+        }
+        for (Pair<Double, Double> pair : coordinatePairs) {
+            if (sqrt(pow(obstacle.getCenterX() - pair.getKey(), 2) +
+                    pow(obstacle.getCenterY() - pair.getValue(), 2))
+                    < obstacle.getRadius()) {
+                System.out.println("Hit obstacle!");
+                return true;
+            }
+        }
+        return false;
     }
 
     private Circle createObstacle() {
