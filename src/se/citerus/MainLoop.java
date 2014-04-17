@@ -101,11 +101,8 @@ public class MainLoop extends Application {
             player.setTranslateX(left ? Double.max(curX - MOVE_VEL, playerWidth) : right ? Double.min(curX + MOVE_VEL, WIDTH - playerWidth) : curX);
             player.setTranslateY(up ? Double.max(curY - MOVE_VEL, playerHeight) : down ? Double.min(curY + MOVE_VEL, HEIGHT - playerHeight) : curY);
 
-            for (Circle obstacle : obstacles) {
-                if (isObstacleColliding(obstacle, player)) System.exit(0);
-//                if (sqrt(pow(obstacle.getCenterX() - player.getTranslateX(), 2) +
-//                        pow(obstacle.getCenterY() - player.getTranslateY(), 2))
-//                        < obstacle.getRadius()) System.exit(0);
+            if (obstacles.stream().anyMatch(obstacle -> isObstacleColliding(obstacle, player))) {
+                System.exit(0);
             }
         }));
 
@@ -136,7 +133,6 @@ public class MainLoop extends Application {
             if (sqrt(pow(obstacle.getCenterX() - x, 2) +
                     pow(obstacle.getCenterY() - y, 2))
                     < obstacle.getRadius()) {
-                System.out.println("Hit obstacle!");
                 return true;
             }
         }
